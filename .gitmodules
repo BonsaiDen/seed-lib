@@ -1,0 +1,3 @@
+[submodule "lithium"]
+	path = lithium
+	url = git@github.com:BonsaiDen/lithium.git
