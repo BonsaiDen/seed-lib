@@ -329,6 +329,23 @@
             });
         },
 
+        async: function(callback, delay, scope) {
+
+            if (is.Integer(delay)) {
+                setTimeout(function() {
+                    callback.call(scope || null);
+
+                }, delay);
+
+            } else {
+                setTimeout(function() {
+                    callback.call(delay || null);
+
+                }, 0);
+            }
+
+        },
+
 
         // Debugging ----------------------------------------------------------
         assert: function(assertion, msg) {
