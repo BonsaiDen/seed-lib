@@ -25,9 +25,28 @@
         destroy: function() {
             this.log('Destroyed');
             for(var i in this) {
-                // TODO overwrite all methods with a throw new Error('Destroyed') one
                 if (this.hasOwnProperty(i)) {
-                    this[i] = null;
+
+                    if (Object.defineProperty) {
+
+                        Object.defineProperty(this, i, {
+                            get: (function(i) {
+                                return function() {
+                                    throw new TypeError('Access to property "' + i + '" of destroyed class instance.');
+                                };
+                            })(i)
+                        });
+
+                    } else {
+                        this[i] = null;
+                    }
+
+                } else if (is.Function(this[i])) {
+                    this[i] = (function(i) {
+                        return function() {
+                            throw new TypeError('Call to method "' + i + '" of destroyed class instance.');
+                        };
+                    })(i);
                 }
             }
         },
