@@ -72,18 +72,16 @@
         },
 
         clear: function() {
+            this.length = 0;
             this._values.length = 0;
             this._keys = {};
         },
 
         at: function(offset) {
-
             if (offset < 0) {
                 offset += this._values.length;
             }
-
             return this._values[offset] || null;
-
         },
 
         first: function() {
