@@ -6,19 +6,6 @@
 
     // Implementation ---------------------------------------------------------
     var tokenExp = /^[0-9a-f]{8}\-[0-9a-f]{4}\-4[0-9a-f]{3}\-[8-9a-b][0-9a-f]{3}\-[0-9a-f]{8}/;
-    function typeCheck(func, type, args) {
-
-        args = args || typeCheck.caller['arguments'];
-        if (args.length === func.length) {
-            return func.apply(null, args);
-
-        } else {
-            func.type = type;
-            return func;
-        }
-
-    }
-
     function typeString(value) {
 
         if (typeof value === 'number') {
@@ -61,187 +48,56 @@
 
         // Types --------------------------------------------------------------
         Number: function(value) {
-            return typeCheck(function(value) {
-                return typeof value === 'number' && !isNaN(value);
-
-            }, 'Number');
+            return typeof value === 'number' && !isNaN(value);
         },
 
         Integer: function(value) {
-            return typeCheck(function(value) {
-                return is.Number(value) && (value | 0) === value;
-
-            }, 'Integer');
+            return is.Number(value) && Math.floor(value) === value && Math.ceil(value) === value;
         },
 
         String: function(value) {
-            return typeCheck(function(value) {
-                return typeof value === 'string';
-
-            }, 'String');
+            return typeof value === 'string';
         },
 
         Boolean: function(value) {
-            return typeCheck(function(value) {
-                return value === true || value === false;
-
-            }, 'Boolean');
+            return value === true || value === false;
         },
 
         Date: function(value) {
-            return typeCheck(function(value) {
-                return value instanceof Date;
-
-            }, 'Date');
+            return value instanceof Date;
         },
 
-        Array: function(value, format) {
-
-            if (arguments.length < 2) {
-                return typeCheck(function(value) {
-                    return value instanceof Array;
-
-                }, 'Array');
-
-            } else {
-
-                var subTypes = format instanceof Array ? format : [format];
-                return typeCheck(function(value) {
-
-                    if (!(value instanceof Array)) {
-                        return false;
-
-                    } else {
-                        var ok = true;
-                        for(var i = 0, l = value.length; i < l; i++) {
-                            if (typeof format === 'function') {
-                                ok &= format(value[i]);
-
-                            } else {
-                                ok &= format[i](value[i]);
-                            }
-                        }
-                        return ok;
-                    }
-
-
-                }, 'Array[' + subTypes.map(function(f) {
-                    return f.type;
-
-                }).join(', ') + ']');
-
-            }
-
+        Array: function(value) {
+            return value instanceof Array;
         },
 
         Object: function(value, format) {
-
-            if (arguments.length < 2) {
-                return typeCheck(function(value) {
-                    return value !== null && value instanceof Object
-                                          && !(value instanceof Array);
-
-                }, 'Object');
-
-            } else {
-
-                var subKeys = is.map(format, function(key, value) {
-                    return key + ': ' + value.type;
-
-                }).join(', ');
-
-                return typeCheck(function(value) {
-                    if (value !== null && value instanceof Object
-                                       && !(value instanceof Array)) {
-
-                        var ok = true;
-                        for(var i in value) {
-                            if (value.hasOwnProperty(i)) {
-                                ok &= format[i](value[i]);
-                            }
-                        }
-                        return ok;
-
-                    } else {
-                        return false;
-                    }
-
-                }, 'Object{' + subKeys + '}');
-
-            }
-
+            return value !== null && value instanceof Object
+                                 && !(value instanceof Array);
         },
 
         Function: function(value) {
-            return typeCheck(function(value) {
-                return value instanceof Function;
-
-            }, 'Function');
+            return value instanceof Function;
         },
 
         Loggable: function(value) {
-            return typeCheck(function(value) {
-                return is.Object(value) && is.Function(value.toString);
-
-            }, 'Loggable');
+            return is.Object(value) && is.Function(value.toString);
         },
 
         Token: function(value) {
-            return typeCheck(function(value) {
-                return value && !!tokenExp.test(value);
-
-            }, 'Token');
+            return value && !!tokenExp.test(value);
         },
 
         Class: function(value, clas) {
-
-            if (arguments.length === 1) {
-                return typeCheck(function(value) {
-                    return Class.is(value);
-
-                }, 'Class');
-
-            } else {
-                return typeCheck(function(value) {
-                    return Class.is(value, clas || Class);
-
-                }, 'Class');
-            }
-
+            return Class.is(value, clas);
         },
 
         Null: function(value) {
-            return typeCheck(function(value) {
-                return value === null;
-
-            }, 'Null');
+            return value === null;
         },
 
         NotNull: function(value) {
-            return typeCheck(function(value) {
-                return value !== null && value !== undefined;
-
-            }, 'NotNull');
-        },
-
-        Signature: function _() {
-
-            var args = _.caller['arguments'];
-            for(var i = 0, l = arguments.length; i < l; i++) {
-
-                var exp = arguments[i],
-                    arg = args[i];
-
-                if (!exp(arg)) {
-                    is.assert(false, 'Argument #' + i + ' must be ' + exp.type + ' but is ' + typeString(arg));
-                }
-
-            }
-
-            if (args.length > arguments.length) {
-                is.assert(false, 'Too many arguments passed');
-            }
-
+            return value !== null && value !== undefined;
         },
 
 
