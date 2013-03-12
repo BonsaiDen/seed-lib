@@ -5,32 +5,34 @@
 
         Client: {
             Ping: 1,
-            Pong: 2
+            Pong: 2,
+            Sync: 3
         },
 
         Game: {
 
             Tick: {
-                Limit: 3,
-                Confirm: 4
+                Limit: 4,
+                Confirm: 5
             },
 
             Action: {
-                Client: 5,
-                Server: 6
+                Client: 6,
+                Server: 7
             },
 
-            Start: 7,
+            Start: 8,
 
             Player: {
-                Info: 8,
-                Update: 9,
-                Left: 10
+                Update: 10,
+                Left: 11
             }
 
         },
 
+        // TODO re-organize these
         Session: {
+
             Token: 20,
             Create: 21,
             Join: 22,
@@ -39,6 +41,7 @@
             Close: 25,
 
             Update: 27,
+
             Player: {
                 Left: 28,
                 Joined: 29
@@ -46,6 +49,7 @@
 
             List: 31,
 
+            // Move under "Action"
             Joined: 32,
             Started: 33,
             Left: 35,
