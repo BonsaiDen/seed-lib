@@ -1,24 +1,44 @@
 (function(exports) {
 
-    // Network Codes ----------------------------------------------------------
     var Network = {
+
+        // Configuration ------------------------------------------------------
+        SyncRange: 100000,
+
+
+        // Network Codes ------------------------------------------------------
+        Error: 0,
 
         Client: {
             Ping: 1,
             Pong: 2,
-            Sync: 3
+            Sync: 3,
+            Error: {
+                Offline: 100
+            }
         },
 
         Game: {
 
             Tick: {
                 Limit: 4,
-                Confirm: 5
+                Confirm: 5,
+
+                // handle this when invalid ticks are send to server
+                Error: {
+                    Invalid: 110
+                }
             },
 
             Action: {
                 Client: 6,
-                Server: 7
+                Server: 7,
+
+                // Handle this when sending invalid actions to the server
+                Error: {
+                    Invalid: 120
+                }
+
             },
 
             Start: 8,
@@ -30,72 +50,72 @@
 
         },
 
-        // TODO re-organize these
         Session: {
 
-            Token: 20,
-            Create: 21,
-            Join: 22,
-            Start: 23,
-            Leave: 24,
-            Close: 25,
-
-            Update: 27,
-
-            Player: {
-                Left: 28,
-                Joined: 29
+            Action: {
+                Create: 21,
+                Join: 22,
+                Start: 23,
+                Leave: 24,
+                Close: 25,
+                Ready: 26, // TODO update session code for this
+                NotReady: 27 // TODO update session code for this
             },
 
-            List: 31,
+            Info: {
+                List: 31,
+                Update: 32 // full update with players etc.
+            },
 
-            // Move under "Action"
-            Joined: 32,
-            Started: 33,
-            Left: 35,
-            Closed: 36,
-            Ready: 37,
-            NotReady: 38
+            Response: {
+                Joined: 33,
+                Started: 34,
+                Left: 35,
+                Closed: 36,
+                Ready: 37,
+                NotReady: 38
+            },
+
+            // TODO fix IDs
+            Player: {
+                Joined: 40,
+                Left: 41,
+                Ready: 42,
+                NotReady: 43
+            },
+
+            Error: {
+                Exists: 200,
+                NotFound: 201,
+                Invalid: 202,
+                NotOwner: 203,
+                Running: 204,
+                Ready: 205,
+                NotReady: 206
+            }
+
         },
 
         Login: {
-            Client: 200,
-            Server: 201
+            Request: 60,
+            Response: 61,
+
+            Error: {
+                RequestFormat: 300,
+                ClientVersion: 301,
+                InvalidGame: 302,
+                InvalidUsername: 303,
+                InvalidAuth: 304,
+                Token: 305
+            }
+
         },
 
-        Err: 100,
-
-        Error: {
-
-            Offline: 10,
-
-            Session: {
-                Exists: 20,
-                NotFound: 21,
-                Invalid: 22,
-                NotOwner: 23,
-                Running: 24,
-                Ready: 25,
-                NotReady: 26
-            },
-
-            Login: {
-                Format: 30,
-                Version: 31,
-                Username: 32,
-                Game: 33,
-                Persona: 34,
-                Token: 35
-            }
+        Server: {
+            Shutdown: 1000
         }
 
     };
-
-    Object.defineProperty(Network, 'Event', {
-        get: function() {
-            throw new Error();
-        }
-    });
 
     exports.Network = Network;
 
