@@ -23,32 +23,43 @@
         $id: 0,
 
         destroy: function() {
+
             this.log('Destroyed');
+
             for(var i in this) {
                 if (this.hasOwnProperty(i)) {
+
+                    this[i] = null;
 
                     if (Object.defineProperty) {
 
                         Object.defineProperty(this, i, {
+
                             get: (function(i) {
                                 return function() {
-                                    throw new TypeError('Access to property "' + i + '" of destroyed class instance.');
+                                    throw new TypeError('GET of property "' + i + '" of destroyed instance.');
+                                };
+                            })(i),
+
+                            set: (function(i) {
+                                return function() {
+                                    throw new TypeError('SET of property "' + i + '" of destroyed instance.');
                                 };
                             })(i)
+
                         });
 
-                    } else {
-                        this[i] = null;
                     }
 
                 } else if (is.Function(this[i])) {
                     this[i] = (function(i) {
                         return function() {
-                            throw new TypeError('Call to method "' + i + '" of destroyed class instance.');
+                            throw new TypeError('Call to method "' + i + '" of destroyed instance.');
                         };
                     })(i);
                 }
             }
+
         },
 
 
@@ -60,9 +71,23 @@
 
         // Helpers ------------------------------------------------------------
         log: function() {
-            var params = [this];
-            params.push.apply(params, arguments);
-            is.log.apply(this, params);
+            is.log(this, arguments);
+        },
+
+        ok: function() {
+            is.ok(this, arguments);
+        },
+
+        info: function() {
+            is.info(this, arguments);
+        },
+
+        warning: function() {
+            is.warning(this, arguments);
+        },
+
+        error: function() {
+            is.error(this, arguments);
         },
 
         toString: function() {

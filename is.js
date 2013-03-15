@@ -4,7 +4,7 @@
     var Class = require('./Class').Class;
 
 
-    // Implementation ---------------------------------------------------------
+    // Helpers ----------------------------------------------------------------
     var tokenExp = /^[0-9a-f]{8}\-[0-9a-f]{4}\-4[0-9a-f]{3}\-[8-9a-b][0-9a-f]{3}\-[0-9a-f]{8}/;
     function typeString(value) {
 
@@ -43,7 +43,17 @@
 
     }
 
+    var colors = {
+        grey: '',
+        none: '',
+        lblue: '',
+        lgreen: '',
+        lred: '',
+        lyellow: ''
+    };
 
+
+    // Implementation ---------------------------------------------------------
     var is = exports.is = {
 
         // Types --------------------------------------------------------------
@@ -52,7 +62,7 @@
         },
 
         Integer: function(value) {
-            return is.Number(value) && Math.floor(value) === value && Math.ceil(value) === value;
+            return is.Number(value) && (value | 0) === value;
         },
 
         String: function(value) {
@@ -210,35 +220,89 @@
             }
         },
 
-        log: function() {
+        log: function(obj, args) {
+            is._log(obj, args);
+        },
 
-            var params = Array.prototype.slice.call(arguments);
-            params = is.map(params, function(p) {
+        ok: function(obj, args) {
+            is._log(obj, args, colors.lgreen);
+        },
 
-                if (is.Loggable(p)) {
+        info: function(obj, args) {
+            is._log(obj, args, colors.lblue);
+        },
 
-                    var s = p.toString();
-                    if (s.substring(0, 8) === '[object ') {
-                        return p;
+        warning: function(obj, args) {
+            is._log(obj, args, colors.lyellow);
+        },
 
-                    } else if (s.substring(0, 1) === '[') {
-                        return s;
+        error: function(obj, args) {
+            is._log(obj, args, colors.lred);
+        },
 
-                    } else {
-                        return '[' + s + ']';
-                    }
+        _log: function(obj, args, color) {
+
+            var values = [obj];
+            values.push.apply(values, args);
+
+            color = color || '';
+
+            var log = [];
+            while(values.length) {
+                var val = values.shift();
+                log.push(is._toLogString(val, values, color));
+            }
+
+            console.log.apply(console, log);
+
+        },
+
+        _toLogString: function(val, values, color) {
+
+            if (is.Loggable(val)) {
+
+                var s = val.toString();
+                if (s.substring(0, 8) === '[object ') {
+                    return val;
+
+                } else if (s.substring(0, 1) === '[') {
+                    return colors.grey + s + colors.none;
 
                 } else {
-                    return p;
+                    return colors.grey + '[' + s + ']' + colors.none;
                 }
 
-            }, this);
+            } else {
 
-            console.log.apply(console, params);
+                // handle placeholders
+                if (is.String(val)) {
+                    val = val.replace(/\%s/g, function(text, match) {
+                        return values.shift();
+                    });
+                }
+
+                return color + val + colors.none;
+
+            }
 
         }
 
     };
+
+    // Colored logging --------------------------------------------------------
+    if (typeof process !== 'undefined' && is.Object(process)) {
+        if (require('tty').isatty(process.stdout.fd)) {
+            colors = {
+                grey: '\033[90m',
+                none: '\033[0m',
+                lblue: '\033[94m',
+                lgreen: '\033[92m',
+                lred: '\033[91m',
+                lyellow: '\033[93m'
+            };
+        }
+    }
+
 
 })(typeof exports !== 'undefined' ? exports : this);
 
