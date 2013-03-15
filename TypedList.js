@@ -117,9 +117,23 @@
         },
 
         single: function(callback, scope) {
-            var values = is.filter(this._values, callback, scope);
-            is.assert(values.length === 1);
-            return values[0];
+
+            if (this.length === 0) {
+                return null;
+
+            } else {
+                var values = is.filter(this._values, callback, scope);
+                is.assert(values.length === 1, 'More than one value in list');
+                return values[0];
+            }
+
+        },
+
+        destroy: function() {
+            is.assert(this.length === 0);
+            this.length = 0;
+            this._values = null;
+            this._keys = null;
         },
 
         _getItemId: function(item) {
