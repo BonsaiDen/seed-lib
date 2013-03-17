@@ -1,47 +1,12 @@
+/*global setImmediate*/
 (function(exports) {
 
     // Dependencies -----------------------------------------------------------
     var Class = require('./Class').Class;
 
 
-    // Helpers ----------------------------------------------------------------
+    // Definitions ------------------------------------------------------------
     var tokenExp = /^[0-9a-f]{8}\-[0-9a-f]{4}\-4[0-9a-f]{3}\-[8-9a-b][0-9a-f]{3}\-[0-9a-f]{8}/;
-    function typeString(value) {
-
-        if (typeof value === 'number') {
-
-            if (isNaN(value)) {
-                return 'NaN';
-
-            } else {
-                return (value | 0) === value ? 'Integer' : 'Number';
-
-            }
-
-        } else if (typeof value === 'string') {
-            return 'String';
-
-        } else if (typeof value === 'function') {
-            return 'Function';
-
-        } else if (value === null) {
-            return 'Null';
-
-        } else if (value === undefined) {
-            return 'Undefined';
-
-        } else if (typeof value === 'object') {
-
-            if (value instanceof Array) {
-                return 'Array';
-
-            } else {
-                return 'Object';
-            }
-
-        }
-
-    }
 
     var colors = {
         grey: '',
@@ -164,18 +129,19 @@
             }
         },
 
-        walk: function(object, callback, scope, path) {
+        walk: function(object, callback, scope, path, level) {
 
+            level = level || 0;
             path = path ? path + '.' : '';
             for(var key in object) {
                 if (object.hasOwnProperty(key)) {
 
                     var value = object[key];
                     if (is.Object(value)) {
-                        is.walk(value, callback, scope, path + key);
+                        is.walk(value, callback, scope, path + key, level + 1);
 
                     } else {
-                        callback.call(scope || null, key, value, object, path + key);
+                        callback.call(scope || null, key, value, object, path + key, level);
                     }
 
                 }
@@ -197,17 +163,24 @@
 
         async: function(callback, delay, scope) {
 
-            if (is.Integer(delay)) {
-                setTimeout(function() {
-                    callback.call(scope || null);
+            if (!is.Integer(delay)) {
+                scope = delay;
+                delay = 0;
+            }
 
-                }, delay);
+            var invoke = function() {
+                callback.call(scope || null);
+            };
+
+            // Use the fastest / most reliable way to invoke the async callback
+            if (typeof setImmediate !== 'undefined' && delay === 0) {
+                setImmediate(invoke);
+
+            } else if (typeof process !== 'undefined' && delay === 0) {
+                process.nextTick(invoke);
 
             } else {
-                setTimeout(function() {
-                    callback.call(delay || null);
-
-                }, 0);
+                setTimeout(invoke, delay);
             }
 
         },
@@ -215,9 +188,46 @@
 
         // Debugging ----------------------------------------------------------
         assert: function(assertion, msg) {
+
             if (!assertion) {
-                throw new Error('Assertion failed: ' + (msg || ''));
+
+                msg = msg || '';
+
+                var err = new Error('Assertion failed: ' + msg);
+                if (typeof process === 'undefined') {
+                    throw err;
+                }
+
+                try {
+                    throw err;
+
+                } catch(e) {
+
+                    var frames = e.stack.split('\n').slice(),
+                        caller = frames[2],
+                        location = caller.match(/\((.*?)\:([0-9]+)\:([0-9]+)\)/i);
+
+                    var fs = require('fs');
+                    try {
+
+                        var contents = fs.readFileSync(location[1]).toString(),
+                            line = contents.split('\n')[location[2] - 1];
+
+                        var origin = line.substring(location[3] - 1).match(/assert\((.*)\)/);
+
+                        err = new Error('Assertion "' + origin[1] + '" failed: ' + msg + '\n'
+                                        + frames.slice(2).join('\n')
+                                        + '\n\n ---- Handler ---- \n');
+
+                    } catch(e) {
+                    }
+
+                    throw err;
+
+                }
+
             }
+
         },
 
         log: function(obj, args) {
@@ -302,7 +312,6 @@
             };
         }
     }
-
 
 })(typeof exports !== 'undefined' ? exports : this);
 

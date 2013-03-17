@@ -123,8 +123,14 @@
 
             } else {
                 var values = is.filter(this._values, callback, scope);
-                is.assert(values.length === 1, 'More than one value in list');
-                return values[0];
+                if (values.length === 0) {
+                    return null;
+
+                } else {
+                    is.assert(values.length === 1, 'More than one value in result');
+                    return values[0];
+                }
+
             }
 
         },
