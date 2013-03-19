@@ -30,7 +30,7 @@
                 Limit: 4,
                 Confirm: 5,
 
-                // handle this when invalid ticks are send to server
+                // TODO handle this when invalid ticks are send to server
                 Error: {
                     Invalid: 110
                 }
@@ -40,7 +40,7 @@
                 Client: 6,
                 Server: 7,
 
-                // Handle this when sending invalid actions to the server
+                // TODO Handle this when sending invalid actions to the server
                 Error: {
                     Invalid: 120
                 }
@@ -114,7 +114,8 @@
                 NotRunning: 207,
                 Paused: 208,
                 NotPaused: 209,
-                NotEnoughPlayers: 10
+                NotEnoughPlayers: 210,
+                Full: 211
             }
 
         },
