@@ -18,6 +18,7 @@
             Ping: 1,
             Pong: 2,
             Sync: 3,
+            Session: 70,
             Error: {
                 Offline: 100
             }
@@ -50,12 +51,14 @@
             Leave: 9,
             Pause: 10,
             Resume: 11,
+            Won: 12,
+            Lost: 13,
 
             Player: {
-                Update: 12,
-                Left: 13,
-                Paused: 14,
-                Resumed: 15
+                Update: 14,
+                Left: 15,
+                Paused: 16,
+                Resumed: 17
             }
 
         },
@@ -76,18 +79,21 @@
 
             Info: {
                 List: 31,
-                Update: 32 // full update with players etc.
+                Update: 32,
+                Players: 33,
+                Ready: 34,
+                NotReady: 35
             },
 
             Response: {
-                Joined: 33,
-                Started: 34,
-                Left: 35,
-                Closed: 36,
-                Ready: 37,
-                NotReady: 38,
-                Paused: 39,
-                Resumed: 40
+                Joined: 40,
+                Started: 41,
+                Left: 42,
+                Closed: 43,
+                Ready: 44,
+                NotReady: 45,
+                Paused: 46,
+                Resumed: 47
             },
 
             Player: {
@@ -107,7 +113,8 @@
                 NotReady: 206,
                 NotRunning: 207,
                 Paused: 208,
-                NotPaused: 209
+                NotPaused: 209,
+                NotEnoughPlayers: 10
             }
 
         },
